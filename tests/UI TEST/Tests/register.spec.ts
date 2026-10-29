@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// Successful Registration
-test('register', async ({ page }) => {
-    await page.goto('/'); // or '/register', resolved against baseURL
+test('Successful registration with valid credentials', async ({ page }) => {
+    await page.goto('/');
     // ...
     await page.getByRole('link', { name: 'Login' }).click();
     await page.getByRole('link', { name: 'Register' }).click();
@@ -22,8 +21,7 @@ test('register', async ({ page }) => {
 });
 
 
-// Attempt to register with an already used email
-test('register with existing email', async ({ page }) => {
+test('Registration fails with already used email', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('link', { name: 'Login' }).click();
     await page.getByRole('link', { name: 'Register' }).click();
