@@ -18,7 +18,9 @@ export default defineConfig({
 				DATABASE_URL:
 					process.env.DATABASE_URL ??
 					"postgresql://dev:dev@localhost:5432/app_dev?schema=public",
-				JWT_SECRET: process.env.JWT_SECRET ?? "test-only-jwt-secret",
+				JWT_SECRET:
+					process.env.JWT_SECRET ??
+					"test-only-jwt-secret-not-for-production-use",
 				FRONTEND_ORIGIN: "http://localhost:8000",
 			},
 		},
