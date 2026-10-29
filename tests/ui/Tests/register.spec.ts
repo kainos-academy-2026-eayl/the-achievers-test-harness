@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { StatusCodes } from "http-status-codes";
+import { test, expect } from "../../api/Fixtures/register-api.fixture";
 
 test("Successful registration with valid credentials", async ({ page }) => {
 	await page.goto("/");
@@ -24,14 +25,21 @@ test("Successful registration with valid credentials", async ({ page }) => {
 	).toBeVisible();
 });
 
-test("Registration fails with already used email", async ({ page }) => {
+test("Registration fails with already used email", async ({
+	page,
+	register,
+	validUser,
+}) => {
+	const response = await register(validUser);
+	expect(response.status()).toBe(StatusCodes.CREATED);
+
 	await page.goto("/");
 	await page.getByRole("link", { name: "Login" }).click();
 	await page.getByRole("link", { name: "Register" }).click();
 	await page.getByTestId("registration-name").click();
 	await page.getByTestId("registration-name").fill("Lee Service");
 	await page.getByTestId("registration-email").click();
-	await page.getByTestId("registration-email").fill("leeservice@gmail.com");
+	await page.getByTestId("registration-email").fill(validUser.email);
 	await page.getByTestId("registration-password").click();
 	await page.getByTestId("registration-password").fill("iamamazing123");
 	await page.getByTestId("registration-confirm-password").click();

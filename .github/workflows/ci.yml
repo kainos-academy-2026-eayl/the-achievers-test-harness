@@ -77,6 +77,10 @@ jobs:
           npm run prebuild
           npm run migrateExisting
 
+      - name: Seed database
+        working-directory: the-achievers-backend
+        run: npm run seed
+
       - name: Typecheck test harness
         working-directory: the-achievers-test-harness
         run: npm run typecheck
