@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@biomejs/biome": "^2.6.4",
     "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.6",
     "typescript": "^7.0.2"
@@ -8,6 +9,15 @@
     "http-status-codes": "^2.3.0"
   },
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:api": "playwright test tests/api",
+    "test:ui": "playwright test tests/ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "build": "npm run typecheck",
+    "typecheck": "tsc",
+    "lint": "biome lint tests playwright.config.ts",
+    "format": "biome format --write tests playwright.config.ts",
+    "format:check": "biome format tests playwright.config.ts"
   }
 }
