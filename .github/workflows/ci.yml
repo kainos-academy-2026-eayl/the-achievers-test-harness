@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, format, typecheck and end-to-end tests
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://dev:dev@localhost:5432/app_dev?schema=public
+      JWT_SECRET: test-only-jwt-secret
+
+    steps:
+      - name: Check out test harness
+        uses: actions/checkout@v4
+        with:
+          path: the-achievers-test-harness
+
+      - name: Check out backend
+        uses: actions/checkout@v4
+        with:
+          repository: kainos-academy-2026-eayl/the-achievers-backend
+          path: the-achievers-backend
+          token: ${{ secrets.REPOSITORY_READ_TOKEN || github.token }}
+
+      - name: Check out frontend
+        uses: actions/checkout@v4
+        with:
+          repository: kainos-academy-2026-eayl/the-achievers-frontend
+          path: the-achievers-frontend
+          token: ${{ secrets.REPOSITORY_READ_TOKEN || github.token }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: the-achievers-backend/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            the-achievers-test-harness/package-lock.json
+            the-achievers-backend/package-lock.json
+            the-achievers-frontend/package-lock.json
+
+      - name: Install test harness dependencies
+        working-directory: the-achievers-test-harness
+        run: npm ci
+
+      - name: Lint test harness
+        working-directory: the-achievers-test-harness
+        run: npm run lint
+
+      - name: Check test harness formatting
+        working-directory: the-achievers-test-harness
+        run: npm run format:check
+
+      - name: Install backend dependencies
+        working-directory: the-achievers-backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: the-achievers-frontend
+        run: npm ci
+
+      - name: Start database
+        working-directory: the-achievers-backend
+        run: docker compose up -d --wait
+
+      - name: Generate Prisma client and apply migrations
+        working-directory: the-achievers-backend
+        run: |
+          npm run prebuild
+          npm run migrateExisting
+
+      - name: Typecheck test harness
+        working-directory: the-achievers-test-harness
+        run: npm run typecheck
+
+      - name: Install Playwright browser
+        working-directory: the-achievers-test-harness
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        working-directory: the-achievers-test-harness
+        run: npm test
+
+      - name: Stop database
+        if: always()
+        working-directory: the-achievers-backend
+        run: docker compose down
