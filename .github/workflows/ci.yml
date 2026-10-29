@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: postgresql://dev:dev@localhost:5432/app_dev?schema=public
-      JWT_SECRET: test-only-jwt-secret
+      JWT_SECRET: test-only-jwt-secret-not-for-production-use
 
     steps:
       - name: Check out test harness
