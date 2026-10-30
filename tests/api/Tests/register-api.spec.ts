@@ -37,17 +37,9 @@ test.describe("POST /api/register", () => {
 
 	test("Rejects an already registered email with 409", async ({
 		register,
-<<<<<<< HEAD
 		registeredUser,
 	}) => {
 		const response = await register(registeredUser);
-=======
-		validUser,
-	}) => {
-		expect((await register(validUser)).status()).toBe(StatusCodes.CREATED);
-
-		const response = await register(validUser);
->>>>>>> origin/main
 
 		expect(response.status()).toBe(StatusCodes.CONFLICT);
 		expect((await response.json()).error).toBe(
