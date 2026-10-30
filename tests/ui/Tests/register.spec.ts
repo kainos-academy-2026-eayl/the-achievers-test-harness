@@ -142,7 +142,7 @@ test.describe("Registration UI", () => {
 		await registerPage.fill(validUser);
 
 		const response = await registerPage.submitAndWaitForResponse();
-		expect(response.status()).toBe(StatusCodes.CREATED);
+		expect(response.status()).toBe(StatusCodes.ACCEPTED);
 		await expect(
 			page.getByText("Your registration details were received."),
 		).toBeVisible();
