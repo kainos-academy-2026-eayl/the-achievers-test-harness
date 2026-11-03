@@ -41,7 +41,7 @@ start_docker_db() {
       bash scripts/sync-migrations.sh
       
       print_step "Seeding database..."
-      cd "$REPO_ROOT/../the-achievers-backend"
+      cd "$REPO_ROOT/../the-achievers-backend-actual"
       DATABASE_URL="postgresql://testuser:testpassword@localhost:5433/app_test?schema=public" \
         npx prisma db seed
       
@@ -94,7 +94,7 @@ full_test_run() {
   cd "$REPO_ROOT"
   bash scripts/sync-migrations.sh
   
-  cd "$REPO_ROOT/../the-achievers-backend"
+  cd "$REPO_ROOT/../the-achievers-backend-actual"
   DATABASE_URL="postgresql://testuser:testpassword@localhost:5433/app_test?schema=public" \
     npx prisma db seed
   
@@ -136,7 +136,7 @@ reset_docker_db() {
       bash scripts/sync-migrations.sh
       
       print_step "Seeding database..."
-      cd "$REPO_ROOT/../the-achievers-backend"
+      cd "$REPO_ROOT/../the-achievers-backend-actual"
       DATABASE_URL="postgresql://testuser:testpassword@localhost:5433/app_test?schema=public" \
         npx prisma db seed
       

@@ -22,7 +22,13 @@ const loadEnvFile = (filePath: string): Record<string, string> => {
 	return env;
 };
 
-const backendEnvTest = loadEnvFile("../the-achievers-backend/.env.test");
+const backendEnvTest = loadEnvFile("../the-achievers-backend-actual/.env.test");
+
+// Shell-exported values take precedence over the harness file.
+const harnessEnvTest = loadEnvFile("./.env.test");
+for (const [key, value] of Object.entries(harnessEnvTest)) {
+	process.env[key] ??= value;
+}
 
 export default defineConfig({
 	testDir: "./tests",
@@ -33,7 +39,7 @@ export default defineConfig({
 	webServer: [
 		{
 			command: "npm run dev",
-			cwd: "../the-achievers-backend",
+			cwd: "../the-achievers-backend-actual",
 			url: "http://localhost:3000/health",
 			reuseExistingServer: !process.env.CI,
 			timeout: 120_000,
@@ -52,7 +58,7 @@ export default defineConfig({
 		},
 		{
 			command: "npm run dev",
-			cwd: "../the-achievers-frontend",
+			cwd: "../the-achievers-frontend-actual",
 			url: "http://localhost:8000",
 			reuseExistingServer: !process.env.CI,
 			timeout: 120_000,
