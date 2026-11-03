@@ -1,0 +1,27 @@
+services:
+  test-db:
+    image: postgres:15-alpine
+    container_name: achievers-test-db
+    environment:
+      POSTGRES_DB: app_test
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - test-db-volume:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d app_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - achievers-test-network
+
+networks:
+  achievers-test-network:
+    driver: bridge
+
+volumes:
+  test-db-volume:

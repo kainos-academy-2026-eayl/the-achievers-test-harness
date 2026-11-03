@@ -1,11 +1,13 @@
-import { test, expect } from "../Fixtures/login-ui.fixture";
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "../Pages/login.page";
+import { generateValidUser, registerUser } from "../../helpers/user.helper";
 
 test.describe("Login UI", () => {
-	test("Successfully logs in with registered credentials", async ({
-		page,
-		loginPage,
-		registeredUser: validUser,
-	}) => {
+	test("Successfully logs in with registered credentials", async ({ page }) => {
+		const validUser = generateValidUser();
+		await registerUser(validUser);
+		const loginPage = new LoginPage(page);
+
 		await loginPage.goto();
 		await loginPage.login(validUser.email, validUser.password);
 
@@ -14,9 +16,11 @@ test.describe("Login UI", () => {
 
 	test("Rejects an incorrect password, retains the email and clears the password", async ({
 		page,
-		loginPage,
-		registeredUser: validUser,
 	}) => {
+		const validUser = generateValidUser();
+		await registerUser(validUser);
+		const loginPage = new LoginPage(page);
+
 		await loginPage.goto();
 		await loginPage.login(`  ${validUser.email}  `, "wrongpassword123");
 
@@ -27,10 +31,9 @@ test.describe("Login UI", () => {
 		await expect(loginPage.password).toHaveValue("");
 	});
 
-	test("Displays error message with non-existent email", async ({
-		page,
-		loginPage,
-	}) => {
+	test("Displays error message with non-existent email", async ({ page }) => {
+		const loginPage = new LoginPage(page);
+
 		await loginPage.goto();
 		await loginPage.login(
 			`nonexistent${Date.now()}@example.com`,
@@ -42,17 +45,18 @@ test.describe("Login UI", () => {
 		await expect(loginPage.notice).toHaveText("Invalid email or password");
 	});
 
-	test("Login page contains link to forgot password", async ({ loginPage }) => {
+	test("Login page contains link to forgot password", async ({ page }) => {
+		const loginPage = new LoginPage(page);
+
 		await loginPage.goto();
 		const forgotLink = loginPage.forgotPasswordLink;
 		await expect(forgotLink).toBeVisible();
 		await expect(forgotLink).toHaveAttribute("href", "/reset-pass");
 	});
 
-	test("Navigating to register link from login page works", async ({
-		page,
-		loginPage,
-	}) => {
+	test("Navigating to register link from login page works", async ({ page }) => {
+		const loginPage = new LoginPage(page);
+
 		await loginPage.goto();
 		await expect(loginPage.registerLink).toBeVisible();
 		await expect(loginPage.registerLink).toHaveAttribute(

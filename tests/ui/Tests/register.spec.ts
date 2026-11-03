@@ -1,5 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-import { test, expect } from "../Fixtures/register-ui.fixture";
+import { test, expect } from "@playwright/test";
+import { RegisterPage } from "../Pages/register.page";
+import { generateValidUser, registerUser } from "../../helpers/user.helper";
 
 test.describe("Registration UI", () => {
 	const requiredFields = [
@@ -12,11 +14,10 @@ test.describe("Registration UI", () => {
 	] as const;
 
 	for (const [name, id] of requiredFields) {
-		test(`Prevents submission without ${name}`, async ({
-			page,
-			registerPage,
-			validUser,
-		}) => {
+		test(`Prevents submission without ${name}`, async ({ page }) => {
+			const validUser = generateValidUser();
+			const registerPage = new RegisterPage(page);
+
 			await registerPage.goto();
 			await registerPage.fill(
 				id === "safe-word-hint"
@@ -41,11 +42,10 @@ test.describe("Registration UI", () => {
 		});
 	}
 
-	test("Prevents submission with an invalid email", async ({
-		page,
-		registerPage,
-		validUser,
-	}) => {
+	test("Prevents submission with an invalid email", async ({ page }) => {
+		const validUser = generateValidUser();
+		const registerPage = new RegisterPage(page);
+
 		await registerPage.goto();
 		await registerPage.fill(validUser);
 		const email = registerPage.fields["registration-email"];
@@ -63,9 +63,10 @@ test.describe("Registration UI", () => {
 
 	test("Rejects mismatched passwords, preserves details and clears secrets", async ({
 		page,
-		registerPage,
-		validUser,
 	}) => {
+		const validUser = generateValidUser();
+		const registerPage = new RegisterPage(page);
+
 		await registerPage.goto();
 		await registerPage.fill(validUser);
 		await registerPage.fields["registration-confirm-password"].fill(
@@ -102,11 +103,10 @@ test.describe("Registration UI", () => {
 		["name", "registration-name", "Enter your name."],
 		["safe word", "registration-safe-word", "Enter a safe word."],
 	] as const) {
-		test(`Rejects a whitespace-only ${name}`, async ({
-			page,
-			registerPage,
-			validUser,
-		}) => {
+		test(`Rejects a whitespace-only ${name}`, async ({ page }) => {
+			const validUser = generateValidUser();
+			const registerPage = new RegisterPage(page);
+
 			await registerPage.goto();
 			await registerPage.fill(validUser);
 			await registerPage.fields[id].fill("   ");
@@ -120,10 +120,9 @@ test.describe("Registration UI", () => {
 		});
 	}
 
-	test("Navigates to login for an existing account", async ({
-		page,
-		registerPage,
-	}) => {
+	test("Navigates to login for an existing account", async ({ page }) => {
+		const registerPage = new RegisterPage(page);
+
 		await registerPage.goto();
 		await registerPage.loginLink.click();
 
@@ -133,11 +132,10 @@ test.describe("Registration UI", () => {
 		).toBeVisible();
 	});
 
-	test("Successfully registers with valid credentials", async ({
-		page,
-		registerPage,
-		validUser,
-	}) => {
+	test("Successfully registers with valid credentials", async ({ page }) => {
+		const validUser = generateValidUser();
+		const registerPage = new RegisterPage(page);
+
 		await registerPage.goto();
 		await registerPage.fill(validUser);
 
@@ -148,10 +146,11 @@ test.describe("Registration UI", () => {
 		).toBeVisible();
 	});
 
-	test("Registration fails with already used email", async ({
-		registerPage,
-		registeredUser,
-	}) => {
+	test("Registration fails with already used email", async ({ page }) => {
+		const registeredUser = generateValidUser();
+		await registerUser(registeredUser);
+		const registerPage = new RegisterPage(page);
+
 		await registerPage.goto();
 		await registerPage.fill(registeredUser);
 		const response = await registerPage.submitAndWaitForResponse();
