@@ -74,42 +74,10 @@ npx playwright test tests/api/Tests/login-api.spec.ts
 
 ### Using a Docker-based test database
 
-To avoid creating test data (like hundreds of accounts) in your main development
-database, run tests against an isolated Docker-based PostgreSQL container:
+**📖 Read these guides:**
 
-```bash
-# Start the test database container
-# (Prisma migrations run automatically to create the schema)
-npm run db:start
-
-# Run tests against the Docker database
-npm run test:docker
-
-# Or run specific test suites (migrations run once when db:start executes)
-DATABASE_URL='postgresql://testuser:testpassword@localhost:5433/app_test?schema=public' npm run test:api
-DATABASE_URL='postgresql://testuser:testpassword@localhost:5433/app_test?schema=public' npm run test:ui
-
-# Reset the database (removes all test data) and re-run tests
-npm run test:docker:reset
-
-# Stop the database when done
-npm run db:stop
-
-# Check database status
-npm run db:status
-```
-
-**How it works:**
-- When you run `npm run db:start`, the Docker database starts and Prisma migrations
-  automatically create the database schema (tables, columns, relationships) from
-  your backend's migrations. This happens only once per database start.
-- The test database is completely isolated from your development database
-- You can reset it anytime with `npm run db:reset` to clear all test data
-
-**Docker prerequisites:**
-- Docker and Docker Compose installed on your system
-- The test database container `achievers-test-db` will run on port `5433` (host)
-  to avoid conflicts with any local PostgreSQL on port `5432`
+1. **[database_explanations/QUICK_START.md](./database_explanations/QUICK_START.md)** — How to run tests
+2. **[database_explanations/HOW_IT_WORKS.md](./database_explanations/HOW_IT_WORKS.md)** — How it works + troubleshooting
 
 ### Other commands
 
@@ -235,27 +203,9 @@ The project includes a Docker setup to isolate test data from your development
 database. This ensures that running tests hundreds of times won't create
 thousands of duplicate accounts in your primary database.
 
-### Files and configuration
-
-- **[docker-compose.yml](./docker-compose.yml):** Docker Compose configuration
-  for the test PostgreSQL container
-- **[.env.test](./.env.test):** Test database connection string (database URL
-  on port `5433`)
-- **[scripts/test-db.sh](./scripts/test-db.sh):** Bash script to start, stop,
-  reset, and check status of the test database
-- **[scripts/init-test-db.sql](./scripts/init-test-db.sql):** PostgreSQL
-  initialization script (runs on first container start)
-
-The Docker container exposes PostgreSQL on port `5433` (not the default `5432`)
-to avoid conflicts with a local PostgreSQL installation. The test database is
-named `app_test` with credentials `testuser:testpassword`.
-
 ## CI
 
 [The CI workflow](./.github/workflows/ci.yml) runs on pushes and pull requests to
 `main`. It installs harness dependencies, checks lint and formatting, and runs
 the TypeScript build check on Node.js 22. It does not currently run integration
 tests or provision the sibling applications/database.
-
-Keep system documentation in this README rather than separate change-summary
-or feature-explanation files.
