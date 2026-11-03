@@ -60,7 +60,7 @@ test.describe("Create product UI", () => {
 
         await createPage.submit();
 
-        await expect(page).toHaveURL("/admin/products/new");
+        await expect(page).toHaveURL("/admin/products");
         await expect(createPage.formError).toContainText(
             "Please fix the errors below.",
         );
