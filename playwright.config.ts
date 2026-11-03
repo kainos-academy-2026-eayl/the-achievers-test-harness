@@ -1,25 +1,24 @@
 import { defineConfig } from "@playwright/test";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
 
 // Load .env.test from backend if it exists
 const loadEnvFile = (filePath: string): Record<string, string> => {
 	if (!fs.existsSync(filePath)) {
 		return {};
 	}
-	
+
 	const content = fs.readFileSync(filePath, "utf-8");
 	const env: Record<string, string> = {};
-	
+
 	content.split("\n").forEach((line) => {
 		const trimmed = line.trim();
 		if (!trimmed || trimmed.startsWith("#")) return;
-		
+
 		const [key, ...valueParts] = trimmed.split("=");
 		const value = valueParts.join("=").replace(/^"|"$/g, "");
 		if (key) env[key.trim()] = value;
 	});
-	
+
 	return env;
 };
 

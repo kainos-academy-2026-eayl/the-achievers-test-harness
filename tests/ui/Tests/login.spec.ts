@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../Pages/login.page";
+import { expect, test } from "@playwright/test";
 import { generateValidUser, registerUser } from "../../helpers/user.helper";
+import { LoginPage } from "../Pages/login.page";
 
 test.describe("Login UI", () => {
 	test("Successfully logs in with registered credentials", async ({ page }) => {
@@ -54,7 +54,9 @@ test.describe("Login UI", () => {
 		await expect(forgotLink).toHaveAttribute("href", "/reset-pass");
 	});
 
-	test("Navigating to register link from login page works", async ({ page }) => {
+	test("Navigating to register link from login page works", async ({
+		page,
+	}) => {
 		const loginPage = new LoginPage(page);
 
 		await loginPage.goto();
