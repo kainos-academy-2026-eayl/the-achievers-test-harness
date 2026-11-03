@@ -23,42 +23,55 @@ const loadEnvFile = (filePath: string): Record<string, string> => {
 };
 
 const backendEnvTest = loadEnvFile("../the-achievers-backend/.env.test");
+const testDatabaseUrl =
+	process.env.TEST_DATABASE_URL ??
+	process.env.DATABASE_URL ??
+	backendEnvTest.DATABASE_URL ??
+	"postgresql://testuser:testpassword@localhost:5433/app_test?schema=public";
+
+if (new URL(testDatabaseUrl).pathname !== "/app_test") {
+	throw new Error("Playwright tests require the dedicated app_test database.");
+}
+
+process.env.TEST_DATABASE_URL = testDatabaseUrl;
+const backendPort = process.env.E2E_BACKEND_PORT ?? "3100";
+const frontendPort = process.env.E2E_FRONTEND_PORT ?? "8100";
+const backendUrl = `http://localhost:${backendPort}`;
+const frontendUrl = `http://localhost:${frontendPort}`;
+process.env.API_URL = backendUrl;
 
 export default defineConfig({
 	testDir: "./tests",
 	use: {
-		baseURL: "http://localhost:8000",
+		baseURL: frontendUrl,
 		testIdAttribute: "id",
 	},
 	webServer: [
 		{
 			command: "npm run dev",
 			cwd: "../the-achievers-backend",
-			url: "http://localhost:3000/health",
+			url: `${backendUrl}/health`,
 			reuseExistingServer: !process.env.CI,
 			timeout: 120_000,
 			env: {
-				PORT: "3000",
-				DATABASE_URL:
-					process.env.DATABASE_URL ??
-					backendEnvTest.DATABASE_URL ??
-					"postgresql://testuser:testpassword@localhost:5433/app_test?schema=public",
+				PORT: backendPort,
+				DATABASE_URL: testDatabaseUrl,
 				JWT_SECRET:
 					process.env.JWT_SECRET ??
 					backendEnvTest.JWT_SECRET ??
 					"test-only-jwt-secret-not-for-production-use",
-				FRONTEND_ORIGIN: "http://localhost:8000",
+				FRONTEND_ORIGIN: frontendUrl,
 			},
 		},
 		{
 			command: "npm run dev",
 			cwd: "../the-achievers-frontend",
-			url: "http://localhost:8000",
+			url: frontendUrl,
 			reuseExistingServer: !process.env.CI,
 			timeout: 120_000,
 			env: {
-				PORT: "8000",
-				BACKEND_URL: "http://localhost:3000",
+				PORT: frontendPort,
+				BACKEND_URL: backendUrl,
 			},
 		},
 	],
