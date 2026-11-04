@@ -67,7 +67,9 @@ full_test_run() {
   # Run tests
   print_step "2/5 Running tests..."
   cd "$REPO_ROOT"
-  npm test
+  # Failing tests must not skip the reset and shutdown below.
+  test_exit=0
+  npm test || test_exit=$?
   
   # Reset database
   print_step "3/5 Resetting database..."
@@ -102,6 +104,11 @@ full_test_run() {
   print_step "Stopping database..."
   cd "$REPO_ROOT"
   docker-compose down
+  
+  if [ "$test_exit" -ne 0 ]; then
+    echo "Tests failed (exit code $test_exit); database was reset and stopped."
+    return "$test_exit"
+  fi
   
   print_success "Full test run complete!"
 }
