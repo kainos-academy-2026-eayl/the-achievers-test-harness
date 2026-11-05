@@ -6,8 +6,8 @@
 
 set -e
 
-MIGRATIONS_DIR="../the-achievers-backend-actual/prisma/migrations"
-BACKEND_DIR="../the-achievers-backend-actual"
+MIGRATIONS_DIR="../the-achievers-backend/prisma/migrations"
+BACKEND_DIR="../the-achievers-backend"
 
 if [ ! -d "$MIGRATIONS_DIR" ]; then
 	echo "❌ Error: Migrations directory not found at $MIGRATIONS_DIR"
