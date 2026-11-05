@@ -1,5 +1,5 @@
-import { defineConfig } from "@playwright/test";
 import * as fs from "node:fs";
+import { defineConfig } from "@playwright/test";
 
 // Load .env.test from backend if it exists
 const loadEnvFile = (filePath: string): Record<string, string> => {
@@ -24,10 +24,11 @@ const loadEnvFile = (filePath: string): Record<string, string> => {
 
 const backendEnvTest = loadEnvFile("../the-achievers-backend-actual/.env.test");
 
-// Shell-exported values take precedence over the harness file.
-const harnessEnvTest = loadEnvFile("./.env.test");
-for (const [key, value] of Object.entries(harnessEnvTest)) {
-	process.env[key] ??= value;
+// Shell exports win over local overrides, then shared harness defaults.
+for (const file of ["./.env.test.local", "./.env.test"]) {
+	for (const [key, value] of Object.entries(loadEnvFile(file))) {
+		process.env[key] ??= value;
+	}
 }
 
 export default defineConfig({

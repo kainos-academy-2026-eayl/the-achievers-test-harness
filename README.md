@@ -56,6 +56,11 @@ Playwright starts the frontend with `PORT=8000` and
 `FRONTEND_ORIGIN=http://localhost:8000`. Reused servers keep their own environment;
 changing harness variables does not reconfigure them. Do not commit credentials.
 
+Put machine-specific `ADMIN_EMAIL` and `ADMIN_PASSWORD` values in the Git-ignored
+`.env.test.local`, matching the admin seeded in the backend's active database.
+Configuration precedence is shell exports, `.env.test.local`, then `.env.test`.
+Changing the harness password does not change the stored admin password.
+
 ## Running and checking tests
 
 ### Using the default local database
@@ -150,6 +155,30 @@ Page objects own reusable browser interactions. Specs own expectations.
 `submit()` for browser-validation tests that block submission.
 
 ## Coverage
+
+### Product updates
+
+Update tests use real backend requests and browser forms, without mocks.
+Each test creates its own UUID-named product and deletes it during fixture
+teardown (including after a failure). Seeded catalogue products are not edited.
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` to a seeded admin account, using the
+existing harness environment configuration. Use a disposable test database.
+
+```bash
+npx playwright test tests/api/Tests/update-product-api.spec.ts tests/ui/Tests/edit-product.spec.ts --workers=1
+```
+
+The API suite checks persistence, catalogue responses, repeated PUTs, price and
+stock boundaries, protected fields, authentication, validation and missing
+products. It asserts the agreed full-replacement PUT contract: all five editable
+fields are required, and stock must be a whole non-negative quantity.
+
+The UI suite checks dashboard Edit links, prefilled fields, saving all five
+fields, shop visibility, Cancel, linked validation messages, browser validation,
+CSRF rejection, missing/deleted products and anonymous/non-admin access.
+The edit page object is in `tests/ui/Pages/edit-product.page.ts`; product setup
+and cleanup reuse the create-product fixtures via
+`tests/api/Fixtures/update-product-api.fixture.ts`.
 
 ### API registration
 
