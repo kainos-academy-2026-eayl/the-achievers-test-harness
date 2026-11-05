@@ -39,6 +39,18 @@ Test database runs on **port 5433** (development database is on 5432)
 
 Your tests automatically connect to the test database. No configuration needed.
 
+## Connect with DBeaver
+
+| Setting  | Value          |
+| -------- | -------------- |
+| Host     | `localhost`    |
+| Port     | `5433`         |
+| Database | `app_test`     |
+| Username | `testuser`     |
+| Password | `testpassword` |
+
+Start the container first with `npm run db:start`. Don't use port 5432, which is the development database.
+
 ## That's All You Need to Know
 
 Everything else is handled automatically. Just run `npm run db:test` when you want a complete test cycle!
